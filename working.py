@@ -78,8 +78,8 @@ async def main_loop():
                         elif "survived" in log_content and "Vault" in log_content:
                             player_name = log_content.split("survived")[0]
                             del players_in_vault[player_name]
-                        elif "died" in log_content and "Vault" in log_content:
-                            player_name = log_content.split("died")[0]
+                        elif "was defeated" in log_content and "Vault" in log_content:
+                            player_name = log_content.split("was defeated")[0]
                             del players_in_vault[player_name]
                         elif "entered" in log_content and "Vault" in log_content:
                             player_name = log_content.split("entered")[0]
