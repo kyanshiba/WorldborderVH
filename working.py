@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 from ampapi.modules.ADS import ADS
 
 # Configuration
@@ -8,6 +9,7 @@ API_USERNAME = "DOGCAT"
 API_PASSWORD = "PASS"
 INSTANCE_NAME = "INSTANCE"
 CHECK_INTERVAL = 10  # seconds
+OPEN_VAULT_WAIT_COUNTS = 180 // CHECK_INTERVAL
 RETRY_INTERVAL = 20  # seconds (time to wait before retrying after a failure)
 
 # Initialize logging
@@ -54,6 +56,8 @@ async def main_loop():
         logging.info(f"Logged in to instance {INSTANCE_NAME}")
 
         counter = 0
+        players_in_vault = {}
+        open_vault_wait_counter = 0
 
         while True:
             try:
@@ -64,21 +68,39 @@ async def main_loop():
                 # Check for matching messages in the console
                 for msg in console:
                     if msg.Type == "Console" and msg.Source == "Server thread/INFO":
+                        player_name = ""
                         log_content = msg.Contents
                         if "completed" in log_content and "Vault!" in log_content:
                             logging.info(f"Matched message: {log_content}")
                             counter += 4
+                            player_name = log_content.split("completed")[0]
+                            del players_in_vault[player_name]
+                        elif "survived" in log_content and "Vault" in log_content:
+                            player_name = log_content.split("survived")[0]
+                            del players_in_vault[player_name]
+                        elif "died" in log_content and "Vault" in log_content:
+                            player_name = log_content.split("died")[0]
+                            del players_in_vault[player_name]
+                        elif "entered" in log_content and "Vault" in log_content:
+                            player_name = log_content.split("entered")[0]
+                            # only the existence of the key matters, the value may be useful for logging
+                            players_in_vault[player_name] = datetime.now()
+                        elif "opened" in log_content and "Vault" in log_content:
+                            open_vault_wait_counter = OPEN_VAULT_WAIT_COUNTS
 
                 # Update world borders if needed
-                if counter != 0:
+                if counter != 0 and open_vault_wait_counter <= 0 and len(players_in_vault) == 0:
                     await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_nether add {counter}")
                     await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_end add {counter}")
                     await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:overworld add {counter}")
                     await Hub.Core.SendConsoleMessageAsync(f"say World Border Increased By: {counter}")
                     logging.info(f"World borders increased by: {counter}")
                     counter = 0
+                elif open_vault_wait_counter > 0:
+                    open_vault_wait_counter -= 1
 
                 # Sleep before checking again
+                
                 await asyncio.sleep(CHECK_INTERVAL)
 
             except Exception as e:
