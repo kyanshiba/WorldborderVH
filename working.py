@@ -12,6 +12,7 @@ CHECK_INTERVAL = 10  # seconds
 OPEN_VAULT_WAIT_COUNTS = 180 // CHECK_INTERVAL
 RETRY_INTERVAL = 20  # seconds (time to wait before retrying after a failure)
 
+border_check = 0
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -89,6 +90,7 @@ async def main_loop():
                             open_vault_wait_counter = OPEN_VAULT_WAIT_COUNTS
 
                 # Update world borders if needed
+                border_check += CHECK_INTERVAL
                 if counter != 0 and open_vault_wait_counter <= 0 and len(players_in_vault) == 0:
                     await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_nether add {counter}")
                     await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_end add {counter}")
@@ -96,8 +98,15 @@ async def main_loop():
                     await Hub.Core.SendConsoleMessageAsync(f"say World Border Increased By: {counter}")
                     logging.info(f"World borders increased by: {counter}")
                     counter = 0
+                    border_check = 0
+                elif open_vault_wait_counter <= 0 and border_check >= 60 and len(players_in_vault) != 0:
+                    logging.info(f"World border counter is: {counter}")
+                    logging.info(players_in_vault)
+                    border_check = 0
                 elif open_vault_wait_counter > 0:
                     open_vault_wait_counter -= 1
+                
+                    
 
                 # Sleep before checking again
                 
