@@ -74,13 +74,22 @@ async def main_loop():
                             logging.info(f"Matched message: {log_content}")
                             counter += 4
                             player_name = log_content.split("completed")[0]
-                            del players_in_vault[player_name]
+                            if player_name in players_in_vault:
+                                del players_in_vault[player_name]
+                            else:
+                                logging.info(f"{player_name} left vault but was not tracked as in vault")
                         elif "survived" in log_content and "Vault" in log_content:
                             player_name = log_content.split("survived")[0]
-                            del players_in_vault[player_name]
+                            if player_name in players_in_vault:
+                                del players_in_vault[player_name]
+                            else:
+                                logging.info(f"{player_name} left vault but was not tracked as in vault")
                         elif "was defeated" in log_content and "Vault" in log_content:
                             player_name = log_content.split("was defeated")[0]
-                            del players_in_vault[player_name]
+                            if player_name in players_in_vault:
+                                del players_in_vault[player_name]
+                            else:
+                                logging.info(f"{player_name} left vault but was not tracked as in vault")
                         elif "entered" in log_content and "Vault" in log_content:
                             player_name = log_content.split("entered")[0]
                             # only the existence of the key matters, the value may be useful for logging
