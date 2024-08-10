@@ -12,7 +12,6 @@ CHECK_INTERVAL = 10  # seconds
 OPEN_VAULT_WAIT_COUNTS = 180 // CHECK_INTERVAL
 RETRY_INTERVAL = 20  # seconds (time to wait before retrying after a failure)
 
-border_check = 0
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -59,7 +58,7 @@ async def main_loop():
         counter = 0
         players_in_vault = {}
         open_vault_wait_counter = 0
-
+        border_check = 0
         while True:
             try:
                 # Get current status and console entries
