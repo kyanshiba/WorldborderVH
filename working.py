@@ -96,7 +96,9 @@ async def main_loop():
                             players_in_vault[player_name] = datetime.now()
                         elif "opened" in log_content and "Vault" in log_content:
                             open_vault_wait_counter = OPEN_VAULT_WAIT_COUNTS
-
+                        elif "dump_variable" in log_content:
+                            await Hub.Core.SendConsoleMessageAsync(f"say border counter currently: {counter}")
+                            await Hub.Core.SendConsoleMessageAsync(f"say border counter currently: {players_in_vault}")
                 # Update world borders if needed
                 border_check += CHECK_INTERVAL
                 if counter != 0 and open_vault_wait_counter <= 0 and len(players_in_vault) == 0:
