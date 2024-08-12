@@ -104,9 +104,10 @@ async def main_loop():
                 # Update world borders if needed
                 border_check += CHECK_INTERVAL
                 if counter != 0 and open_vault_wait_counter <= 0 and len(players_in_vault) == 0:
-                    await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_nether add {counter}")
-                    await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_end add {counter}")
-                    await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:overworld add {counter}")
+                    # await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_nether add {counter}")
+                    # await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:the_end add {counter}")
+                    # await Hub.Core.SendConsoleMessageAsync(f"dimworldborder minecraft:overworld add {counter}")
+                    await Hub.Core.SendConsoleMessageAsync(f"worldborder add {counter}")
                     await Hub.Core.SendConsoleMessageAsync(f"say World Border Increased By: {counter}")
                     logging.info(f"World borders increased by: {counter}")
                     counter = 0
